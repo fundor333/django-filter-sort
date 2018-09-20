@@ -18,6 +18,9 @@ install:
   - pip install -U pip wheel
 
 
+script:
+  - echo Ciao
+
 deploy:
   provider: pypi
   user: fundor333
