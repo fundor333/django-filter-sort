@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class FilterSorterConfig(AppConfig):
-    name = 'filter_sorter'
+    name = "filter_sorter"
