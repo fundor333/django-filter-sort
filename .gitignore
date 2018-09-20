@@ -1,2 +1,5 @@
 /build
 /dist
+\.vscode/
+
+filter_sort\.egg-info/
