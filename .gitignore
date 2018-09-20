@@ -5,3 +5,9 @@
 filter_sort\.egg-info/
 
 filter_sorter\.egg-info/
+
+django_filter_sorter\.egg-info/
+
+filter_sorter/__pycache__/
+
+filter_sorter/templatetags/__pycache__/
