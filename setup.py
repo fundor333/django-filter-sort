@@ -25,7 +25,7 @@ LICENSE = "MIT License"
 VERSION = None
 
 # What packages are required for this module to be executed?
-REQUIRED = ["Django>=2.0", "django-filter>=2.0.0"]
+REQUIRED = ["Django>=2.1", "django-filter>=2.0.0"]
 
 # What packages are optional?
 EXTRAS = {
