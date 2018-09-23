@@ -2,12 +2,12 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render
-from django.views.generic import ListView
+from django.views.generic import MultipleObjectTemplateResponseMixin, BaseListView
 from django_filters.views import FilterMixin
 from django.conf import settings
 
 
-class FilterListView(ListView, FilterMixin):
+class FilterListView(MultipleObjectTemplateResponseMixin, BaseListView, FilterMixin):
     template_name_suffix = "_filter"
     paginate_by = getattr(settings, "DJANGO_FILTER_SORT_PAGINATE_BY", None)
     page_kwarg = getattr(settings, "DJANGO_FILTER_SORT_PAGE_KWARG", "page")

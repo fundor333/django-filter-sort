@@ -5,25 +5,29 @@ register = template.Library()
 
 
 @register.simple_tag
-def url_replace(request, field, value):
+def url_replace(value, field_name, params=None):
     """
     Give a field and a value and it's update the post parameter for the url accordly
     """
-
-    dict_ = request.GET.copy()
-    dict_[field] = value
-    return dict_.urlencode()
+    url = "?{}={}".format(field_name, value)
+    if params:
+        querystring = params.split("&")
+        filtered_querystring = filter(
+            lambda p: p.split("=")[0] != field_name, querystring
+        )
+        encoded_querystring = "&".join(filtered_querystring)
+        url = "{}&{}".format(url, encoded_querystring)
+    return url
 
 
 @register.simple_tag
-def sort_by(request, field, value):
+def sort_by(value, params):
     """
-    Give a field name for sorting
+    Give the url for the sorting
     """
 
-    dict_ = request.GET.copy()
-    dict_[field] = value
-    return dict_.urlencode()
+    field_name = getattr(settings, "DJANGO_FILTER_SORT_SORT_KWARG", "sort")
+    return url_replace(value, field_name, params)
 
 
 @register.filter
