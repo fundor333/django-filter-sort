@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 django = "==2.1.*"
+django-filter=">=2.0.0"
 
 [dev-packages]
 pylint = "*"
