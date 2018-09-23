@@ -45,8 +45,8 @@ templates_path = ["_templates"]
 
 from recommonmark.parser import CommonMarkParser
 
-source_parsers = {'.md': CommonMarkParser}
-source_suffix = ['.rst', '.md']
+source_parsers = {".md": CommonMarkParser}
+source_suffix = [".rst", ".md"]
 
 
 # The master toctree document.
@@ -177,4 +177,3 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ["search.html"]
-

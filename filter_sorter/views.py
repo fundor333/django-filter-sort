@@ -22,14 +22,13 @@ class FilterListView(MultipleObjectTemplateResponseMixin, BaseListView, FilterMi
         else:
             self.object_list = queryset
 
-
     def get(self, request, *args, **kwargs):
 
         allow_empty = self.get_allow_empty()
 
         if not allow_empty:
             if self.get_paginate_by(self.object_list) is not None and hasattr(
-                    self.object_list, "exists"
+                self.object_list, "exists"
             ):
                 is_empty = not self.object_list.exists()
             else:
