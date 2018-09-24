@@ -1,13 +1,18 @@
 [[source]]
-url = "https://pypi.org/simple"
+url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
 [packages]
+django = "==2.1.*"
+django-filter=">=2.0.0"
 
 [dev-packages]
-sphinx = "*"
+pylint = "*"
+sphinx ="*"
 alabaster = {editable = true, git = "https://github.com/bitprophet/alabaster/"}
+recommonmark ="*"
+black = "*"
 
 [requires]
 python_version = "3.6"

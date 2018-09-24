@@ -1,20 +1,29 @@
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Q
+from django.conf import settings
 from django.http import Http404
-from django.shortcuts import render
-from django.views.generic import ListView
+from django.views.generic.list import MultipleObjectTemplateResponseMixin, BaseListView
 from django_filters.views import FilterMixin
 
 
-class FilterListView(ListView, FilterMixin):
+class FilterListView(MultipleObjectTemplateResponseMixin, BaseListView, FilterMixin):
     template_name_suffix = "_filter"
+    paginate_by = getattr(settings, "DJANGO_FILTER_SORT_PAGINATE_BY", None)
+    page_kwarg = getattr(settings, "DJANGO_FILTER_SORT_PAGE_KWARG", "page")
+    sort_kwarg = getattr(settings, "DJANGO_FILTER_SORT_SORT_KWARG", "sort")
 
-    def get(self, request, *args, **kwargs):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         filterset_class = self.get_filterset_class()
         self.filterset = self.get_filterset(filterset_class)
+
         queryset = self.filterset.qs
 
-        self.object_list = queryset
+        if self.kwargs[self.sort_kwarg]:
+            self.object_list = queryset.order_by(self.kwargs[self.sort_kwarg])
+        else:
+            self.object_list = queryset
+
+    def get(self, request, *args, **kwargs):
+
         allow_empty = self.get_allow_empty()
 
         if not allow_empty:
