@@ -10,21 +10,18 @@ class FilterListView(MultipleObjectTemplateResponseMixin, BaseListView, FilterMi
     page_kwarg = getattr(settings, "DJANGO_FILTER_SORT_PAGE_KWARG", "page")
     sort_kwarg = getattr(settings, "DJANGO_FILTER_SORT_SORT_KWARG", "sort")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def get(self, request, **kwargs):
+
+        allow_empty = self.get_allow_empty()
         filterset_class = self.get_filterset_class()
         self.filterset = self.get_filterset(filterset_class)
 
         queryset = self.filterset.qs
 
-        if self.kwargs[self.sort_kwarg]:
+        if self.sort_kwarg in self.kwargs:
             self.object_list = queryset.order_by(self.kwargs[self.sort_kwarg])
         else:
             self.object_list = queryset
-
-    def get(self, request, *args, **kwargs):
-
-        allow_empty = self.get_allow_empty()
 
         if not allow_empty:
             if self.get_paginate_by(self.object_list) is not None and hasattr(
