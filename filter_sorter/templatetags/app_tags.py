@@ -21,7 +21,7 @@ def url_replace(value, field_name, params=None):
 
 
 @register.simple_tag
-def sort_by(value, params):
+def sorted_by(value, params):
     """
     Give the url for the sorting
     """
