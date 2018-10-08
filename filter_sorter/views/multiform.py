@@ -3,9 +3,54 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
 
 # Taken from https://gist.github.com/jamesbrobb/748c47f46b9bd224b07f
+# Example https://stackoverflow.com/questions/15497693/django-can-class-based-views-accept-two-forms-at-a-time/24011448#24011448
 
 
 class MultiFormMixin(ContextMixin):
+    """
+    This is an example usage
+
+    class SignupLoginView(MultiFormsView):
+        template_name = 'public/my_login_signup_template.html'
+        form_classes = {'login': LoginForm,
+                        'signup': SignupForm}
+        success_url = 'my/success/url'
+
+        def get_login_initial(self):
+            return {'email':'dave@dave.com'}
+
+        def get_signup_initial(self):
+            return {'email':'dave@dave.com'}
+
+        def get_context_data(self, **kwargs):
+            context = super(SignupLoginView, self).get_context_data(**kwargs)
+            context.update({"some_context_value": 'blah blah blah',
+                            "some_other_context_value": 'blah'})
+            return context
+
+        def login_form_valid(self, form):
+            return form.login(self.request, redirect_url=self.get_success_url())
+
+        def signup_form_valid(self, form):
+            user = form.save(self.request)
+            return form.signup(self.request, user, self.get_success_url())
+
+    and the template looks like this
+
+    <form class="login" method="POST" action="{% url 'my_view' %}">
+        {% csrf_token %}
+        {{ forms.login.as_p }}
+
+        <button name='action' value='login' type="submit">Sign in</button>
+    </form>
+
+    <form class="signup" method="POST" action="{% url 'my_view' %}">
+        {% csrf_token %}
+        {{ forms.signup.as_p }}
+
+        <button name='action' value='signup' type="submit">Sign up</button>
+    </form>
+    """
     form_classes = {}
     prefixes = {}
     success_urls = {}
