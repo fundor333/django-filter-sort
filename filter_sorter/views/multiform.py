@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.edit import ProcessFormView
+from django.core.exceptions import ImproperlyConfigured
 
 
 # Taken from https://gist.github.com/jamesbrobb/748c47f46b9bd224b07f
@@ -8,51 +9,6 @@ from django.views.generic.edit import ProcessFormView
 
 
 class MultiFormMixin(ContextMixin):
-    """
-    This is an example usage
-
-    class SignupLoginView(MultiFormsView):
-        template_name = 'public/my_login_signup_template.html'
-        form_classes = {'login': LoginForm,
-                        'signup': SignupForm}
-        success_url = 'my/success/url'
-
-        def get_login_initial(self):
-            return {'email':'dave@dave.com'}
-
-        def get_signup_initial(self):
-            return {'email':'dave@dave.com'}
-
-        def get_context_data(self, **kwargs):
-            context = super(SignupLoginView, self).get_context_data(**kwargs)
-            context.update({"some_context_value": 'blah blah blah',
-                            "some_other_context_value": 'blah'})
-            return context
-
-        def login_form_valid(self, form):
-            return form.login(self.request, redirect_url=self.get_success_url())
-
-        def signup_form_valid(self, form):
-            user = form.save(self.request)
-            return form.signup(self.request, user, self.get_success_url())
-
-    and the template looks like this
-
-    <form class="login" method="POST" action="{% url 'my_view' %}">
-        {% csrf_token %}
-        {{ forms.login.as_p }}
-
-        <button name='action' value='login' type="submit">Sign in</button>
-    </form>
-
-    <form class="signup" method="POST" action="{% url 'my_view' %}">
-        {% csrf_token %}
-        {{ forms.signup.as_p }}
-
-        <button name='action' value='signup' type="submit">Sign up</button>
-    </form>
-    """
-
     form_classes = {}
     prefixes = {}
     success_urls = {}
@@ -65,23 +21,22 @@ class MultiFormMixin(ContextMixin):
     def get_form_classes(self):
         return self.form_classes
 
-    def get_forms(self, form_classes, form_names=None, bind_all=False):
-        return dict(
-            [
-                (
-                    key,
-                    self._create_form(
-                        key, klass, (form_names and key in form_names) or bind_all
-                    ),
-                )
-                for key, klass in form_classes.items()
-            ]
-        )
+    def get_forms(self):
+        """
+        Return the dictionary of the forms
+        """
+
+        if self.form_classes:
+            return self.form_classes
+        else:
+            msg = "'%s' must define 'form_classes'"
+            raise ImproperlyConfigured(msg % self.__class__.__name__)        
+        
 
     def get_context_data(self, **kwargs):
         """Insert the form into the context dict."""
         if "form" not in kwargs:
-            kwargs["forms"] = self.get_forms(form_classes=self.form_classes)
+            kwargs["forms"] = self.get_forms()
         return super().get_context_data(**kwargs)
 
     def get_form_kwargs(self, form_name, bind_form=False):
@@ -94,7 +49,7 @@ class MultiFormMixin(ContextMixin):
 
         return kwargs
 
-#TODO Rework for check all the code
+    #TODO Rework for check all the code
     def forms_valid(self, forms, form_name):
         form_valid_method = "%s_form_valid" % form_name
         if hasattr(self, form_valid_method):
@@ -134,13 +89,14 @@ class MultiFormMixin(ContextMixin):
 
 
 class ProcessMultipleFormsView(View):
+    """Render a form on GET and processes it on POST."""
     def get(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
         form_classes = self.get_form_classes()
         form_name = request.POST.get("action")
-        forms = self.get_forms(form_classes, None, True)
+        forms = self.get_forms()
         if all([form.is_valid() for form in forms.values()]):
             return self.forms_valid(forms)
         else:
@@ -148,10 +104,6 @@ class ProcessMultipleFormsView(View):
 
     def put(self, *args, **kwargs):
         return self.post(*args, **kwargs)
-
-
-
-
 
 
 
