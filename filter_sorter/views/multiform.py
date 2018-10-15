@@ -76,6 +76,13 @@ class MultiFormMixin(ContextMixin):
             ]
         )
 
+    def get_context_data(self, **kwargs):
+        """Insert the form into the context dict."""
+        if 'form' not in kwargs:
+            kwargs['forms'] = self.get_forms()
+        return super().get_context_data(**kwargs)
+
+
     def get_form_kwargs(self, form_name, bind_form=False):
         kwargs = {}
         kwargs.update({"initial": self.get_initial(form_name)})
@@ -126,9 +133,7 @@ class MultiFormMixin(ContextMixin):
 
 class ProcessMultipleFormsView(ProcessFormView):
     def get(self, request, *args, **kwargs):
-        form_classes = self.get_form_classes()
-        forms = self.get_forms(form_classes)
-        return self.render_to_response(self.get_context_data(forms=forms))
+        return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
         form_classes = self.get_form_classes()
