@@ -79,7 +79,7 @@ class MultiFormMixin(ContextMixin):
     def get_context_data(self, **kwargs):
         """Insert the form into the context dict."""
         if 'form' not in kwargs:
-            kwargs['forms'] = self.get_forms()
+            kwargs['forms'] = self.get_forms(form_classes=self.form_classes)
         return super().get_context_data(**kwargs)
 
 
