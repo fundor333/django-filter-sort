@@ -1,0 +1,182 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Multiform &#8212; Django Filter Sort 0.4.3 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/monokai.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="FilterView" href="filterview.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="multiform">
+<h1>Multiform<a class="headerlink" href="#multiform" title="Permalink to this headline">¶</a></h1>
+<p>A view that displays any number of forms. On error, redisplays the form with validation errors; on success, redirects to a new URL.</p>
+<div class="section" id="classview">
+<h2>ClassView<a class="headerlink" href="#classview" title="Permalink to this headline">¶</a></h2>
+<p>Example myapp/forms.py:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django</span> <span class="k">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">SaleContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">send_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># send email using the self.cleaned_data dictionary</span>
+        <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">SupportContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">send_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># send email using the self.cleaned_data dictionary</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Now for use them in one ClassView you need to create:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SignupLoginView</span><span class="p">(</span><span class="n">MultiFormsView</span><span class="p">):</span>
+<span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;public/my_login_signup_template.html&#39;</span>
+<span class="n">form_classes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sale&#39;</span><span class="p">:</span> <span class="n">SaleContactForm</span><span class="p">,</span>
+                <span class="s1">&#39;support&#39;</span><span class="p">:</span> <span class="n">SupportContactForm</span><span class="p">}</span>
+<span class="n">success_url</span> <span class="o">=</span> <span class="s1">&#39;my/success/url&#39;</span>
+
+<span class="k">def</span> <span class="nf">get_sale_initial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;Jhon Smith&#39;</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_support_initial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;Jhon Smith&#39;</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">sale_form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">form</span><span class="o">.</span><span class="n">sale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">redirect_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">support_form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">send_email</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">form</span><span class="o">.</span><span class="n">support</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>  <span class="n">redirect_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="themplate">
+<h2>Themplate<a class="headerlink" href="#themplate" title="Permalink to this headline">¶</a></h2>
+<p>Example for the themplate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">form</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;sale&quot;</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;{</span><span class="si">% u</span><span class="s2">rl &#39;my_view&#39; %}&quot;</span><span class="o">&gt;</span>
+    <span class="p">{</span><span class="o">%</span> <span class="n">csrf_token</span> <span class="o">%</span><span class="p">}</span>
+    <span class="p">{{</span> <span class="n">forms</span><span class="o">.</span><span class="n">sale</span><span class="o">.</span><span class="n">as_p</span> <span class="p">}}</span>
+
+    <span class="o">&lt;</span><span class="n">button</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;action&#39;</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;sale&#39;</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;submit&quot;</span><span class="o">&gt;</span><span class="n">Send</span> <span class="n">Sale</span><span class="o">&lt;/</span><span class="n">button</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">form</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">form</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;support&quot;</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;{</span><span class="si">% u</span><span class="s2">rl &#39;my_view&#39; %}&quot;</span><span class="o">&gt;</span>
+    <span class="p">{</span><span class="o">%</span> <span class="n">csrf_token</span> <span class="o">%</span><span class="p">}</span>
+    <span class="p">{{</span> <span class="n">forms</span><span class="o">.</span><span class="n">support</span><span class="o">.</span><span class="n">as_p</span> <span class="p">}}</span>
+
+    <span class="o">&lt;</span><span class="n">button</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;action&#39;</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;support&#39;</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;submit&quot;</span><span class="o">&gt;</span><span class="n">Send</span> <span class="n">Support</span><span class="o">&lt;/</span><span class="n">button</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">form</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>N.B.</strong> You need to use the forms’ “names” as attribute set to “action” and their “value” attribute must match the name given to the form in the ‘form_classes’ dict.
+If you don’t do it, the post will be all the forms of the page</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Django Filter Sort</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="filterview.html">FilterView</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Multiform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classview">ClassView</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#themplate">Themplate</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="filterview.html" title="previous chapter">FilterView</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Fundor333.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/classview/multiform.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

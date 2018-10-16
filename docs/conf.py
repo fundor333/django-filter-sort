@@ -19,14 +19,16 @@
 
 # -- Project information -----------------------------------------------------
 
+## Settings
+
 project = "Django Filter Sort"
 copyright = "2018, Fundor333"
 author = "Fundor333"
 
 # The short X.Y version
-version = ""
+version = "0.4.3"
 # The full version, including alpha/beta/rc tags
-release = ""
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -42,11 +44,6 @@ extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-
-from recommonmark.parser import CommonMarkParser
-
-source_parsers = {".md": CommonMarkParser}
-source_suffix = [".rst", ".md"]
 
 
 # The master toctree document.
@@ -65,7 +62,7 @@ language = None
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = "monokai"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -73,7 +70,8 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_css_files = ["monokai.css"]
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
