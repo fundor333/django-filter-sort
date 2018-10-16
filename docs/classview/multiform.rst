@@ -69,5 +69,5 @@ Example for the themplate::
         <button name='action' value='support' type="submit">Send Support</button>
     </form>
 
-**N.B.** You need to use the forms' "names" as attribute set to "action" and their 'value' attribute must match the name given to the form in the 'form_classes' dict.
+**N.B.** You need to use the forms' "names" as attribute set to "action" and their "value" attribute must match the name given to the form in the "form_classes" dict.
 If you don't do it, the post will be all the forms of the page
