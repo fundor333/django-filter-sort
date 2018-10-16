@@ -13,3 +13,5 @@ filter_sorter/__pycache__/
 filter_sorter/templatetags/__pycache__/
 
 \.idea/
+
+requirements\.txt
