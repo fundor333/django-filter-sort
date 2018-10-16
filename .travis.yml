@@ -1,29 +1,9 @@
-sudo: false
-
 language: python
+python:
+  - "3.6"
 
-matrix:
- include:
-  - python: 3.5
-    env: TOXENV=py35
-  - python: 3.5
-    env: TOXENV=quality
-  - python: 3.6
-    env: TOXENV=py36
+sudo: false
+cache: pip
 
-cache:
-  - pip
-
-install:
-  - pip install -U pip wheel
-  - pip install sphinx
-
-
-script:
-  - sphinx-build -nWT -b html docs docs/_build/html
-
-deploy:
-  provider: pypi
-  user: fundor333
-  password:
-    secure: rZqSenEc/lnAd192KuKRueBdYmVhVTa8G0JUHwJVIABvAgVPIzHan0PtwqnyqpOvXQTAviGT5i67dDELelwxCVurpa/67FguSjg0IsX+yFb53dK82zA0fOfOpwQDF4wV0HglJCpuqOTCnWTlewalAZs8q0Ki4u45Qi8RpaULYKZfy5JKzAbxZO6LOFnF6REMBeTJFnUAcAsC9v5HFInojSzSk/tNpcV/E1yPnzMRNNF1yv03Ya1fWG6RaB7yjeRz8m7JjeU6G7LlO/vk/iKWOWSB0KGJdAq9qohpxDXoVefBFF+Lx1qNnEFyVGn2zviNCGwNxQACiUimUWf+1BGl+V0okqtp1Xk5kDivxvTSLvhVRaPMbpJqTZgLA3mAEjWxaFGSQqkGcDKo3cxvn2tpJEvOp8ygFEUPDFqsHADxh7YLE40glCVSWA99/x4CAOG9G2TKwnlvvqOqIzdscO1XQBvjvWL04p76TGnNKErEsn+5KddUd9KxX8Aah42XhIF8Vhuy7YS9qKQ3GAYrtmeDpf0daPUJAh/7+Shf4WXuv/xaDxUKBS49aH37x2EXFjI2OsA46dY8acyl0Xfm2tnsdR3QpSwg5bbizZme2a+GpBjQF1CT9Gz/YNaUqEhN29Ot5vt3b4NnyfbKJwYbd4AhIjElqdwl1nK0MU5C53LMTy8=
+install: "pip install sphinx"
+script: sphinx-build -nWT -b dummy docs docs/_build/html
