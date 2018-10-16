@@ -16,10 +16,11 @@ cache:
 
 install:
   - pip install -U pip wheel
+  - pip install sphinx
 
 
 script:
-  - echo Ciao
+  - sphinx-build -nWT -b html docs docs/_build/html
 
 deploy:
   provider: pypi
