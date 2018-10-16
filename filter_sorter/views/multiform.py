@@ -1,8 +1,6 @@
 from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
-from django.core.exceptions import ImproperlyConfigured
-
 
 # Taken from https://gist.github.com/jamesbrobb/748c47f46b9bd224b07f
 # Example https://stackoverflow.com/questions/15497693/django-can-class-based-views-accept-two-forms-at-a-time/24011448#24011448
@@ -21,23 +19,18 @@ class MultiFormMixin(ContextMixin):
     def get_form_classes(self):
         return self.form_classes
 
-    def get_forms(self):
-        """
-        Return the dictionary of the forms
-        """
-
-        if self.form_classes:
-            return self.form_classes
-        else:
-            msg = "'%s' must define 'form_classes'"
-            raise ImproperlyConfigured(msg % self.__class__.__name__)        
-        
-
-    def get_context_data(self, **kwargs):
-        """Insert the form into the context dict."""
-        if "form" not in kwargs:
-            kwargs["forms"] = self.get_forms()
-        return super().get_context_data(**kwargs)
+    def get_forms(self, form_classes, form_names=None, bind_all=False):
+        return dict(
+            [
+                (
+                    key,
+                    self._create_form(
+                        key, klass, (form_names and key in form_names) or bind_all
+                    ),
+                )
+                for key, klass in form_classes.items()
+            ]
+        )
 
     def get_form_kwargs(self, form_name, bind_form=False):
         kwargs = {}
@@ -46,16 +39,23 @@ class MultiFormMixin(ContextMixin):
 
         if bind_form:
             kwargs.update(self._bind_form_data())
-
+        if self.request.method in ("POST", "PUT"):
+            kwargs.update({"data": self.request.POST, "files": self.request.FILES})
         return kwargs
 
-    #TODO Rework for check all the code
+    def get_success_urls(self, form_name=None):
+        if form_name in self.success_urls:
+            return self.success_urls[form_name]
+        else:
+            return self.get_success_url()
+
     def forms_valid(self, forms, form_name):
         form_valid_method = "%s_form_valid" % form_name
+
         if hasattr(self, form_valid_method):
             return getattr(self, form_valid_method)(forms[form_name])
         else:
-            return HttpResponseRedirect(self.get_success_url(form_name))
+            return HttpResponseRedirect(self.get_success_urls(form_name))
 
     def forms_invalid(self, forms):
         return self.render_to_response(self.get_context_data(forms=forms))
@@ -69,9 +69,6 @@ class MultiFormMixin(ContextMixin):
 
     def get_prefix(self, form_name):
         return self.prefixes.get(form_name, self.prefix)
-
-    def get_success_url(self, form_name=None):
-        return self.success_urls.get(form_name, self.success_url)
 
     def _create_form(self, form_name, klass, bind_form):
         form_kwargs = self.get_form_kwargs(form_name, bind_form)
@@ -87,24 +84,40 @@ class MultiFormMixin(ContextMixin):
             return {"data": self.request.POST, "files": self.request.FILES}
         return {}
 
+    def get_context_data(self, **kwargs):
+        k = super().get_context_data()
+        k["forms"] = self.get_forms(self.get_form_classes())
+        return k
 
-class ProcessMultipleFormsView(View):
-    """Render a form on GET and processes it on POST."""
-    def get(self, request, *args, **kwargs):
-        return self.render_to_response(self.get_context_data())
 
+class ProcessMultipleFormsView(ProcessFormView):
     def post(self, request, *args, **kwargs):
         form_classes = self.get_form_classes()
         form_name = request.POST.get("action")
-        forms = self.get_forms()
+        if self._individual_exists(form_name):
+            return self._process_individual_form(form_name, form_classes)
+        else:
+            return self._process_all_forms(form_classes)
+
+    def _individual_exists(self, form_name):
+        return form_name in self.form_classes
+
+    def _process_individual_form(self, form_name, form_classes):
+        forms = self.get_forms(form_classes, (form_name,))
+        form = forms.get(form_name)
+        if not form:
+            return HttpResponseForbidden()
+        elif form.is_valid():
+            return self.forms_valid(forms, form_name)
+        else:
+            return self.forms_invalid(forms)
+
+    def _process_all_forms(self, form_classes):
+        forms = self.get_forms(form_classes, None, True)
         if all([form.is_valid() for form in forms.values()]):
             return self.forms_valid(forms)
         else:
             return self.forms_invalid(forms)
-
-    def put(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
-
 
 
 class BaseMultipleFormsView(MultiFormMixin, ProcessMultipleFormsView):
