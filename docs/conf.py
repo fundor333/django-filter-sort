@@ -62,7 +62,6 @@ language = None
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "monokai"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -70,7 +69,7 @@ pygments_style = "monokai"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_css_files = ["monokai.css"]
+html_theme = "alabaster"
 
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -92,8 +91,11 @@ html_static_path = ["_static"]
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
-
+html_theme_options = {
+    "github_user": "fundor333",
+    "github_repo": "django-filter-sort",
+    "github_banner": True,
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
