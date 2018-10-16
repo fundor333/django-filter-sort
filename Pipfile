@@ -15,7 +15,6 @@ django-filter = ">=2.0.0"
 
 pylint = "*"
 sphinx = "*"
-alabaster = {editable = true, git = "https://github.com/bitprophet/alabaster/"}
 recommonmark = "*"
 black = "*"
 twine = "*"
