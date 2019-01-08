@@ -1,9 +1,5 @@
-from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.views.generic.base import ContextMixin, TemplateResponseMixin
-from django.views.generic.edit import ProcessFormView
-
-# Taken from https://gist.github.com/jamesbrobb/748c47f46b9bd224b07f
-# Example https://stackoverflow.com/questions/15497693/django-can-class-based-views-accept-two-forms-at-a-time/24011448#24011448
+from django.http import HttpResponseRedirect
+from django.views.generic.base import ContextMixin
 
 
 class MultiFormMixin(ContextMixin):
@@ -88,45 +84,3 @@ class MultiFormMixin(ContextMixin):
         k = super().get_context_data()
         k["forms"] = self.get_forms(self.get_form_classes())
         return k
-
-
-class ProcessMultipleFormsView(ProcessFormView):
-    def post(self, request, *args, **kwargs):
-        form_classes = self.get_form_classes()
-        form_name = request.POST.get("action")
-        if self._individual_exists(form_name):
-            return self._process_individual_form(form_name, form_classes)
-        else:
-            return self._process_all_forms(form_classes)
-
-    def _individual_exists(self, form_name):
-        return form_name in self.form_classes
-
-    def _process_individual_form(self, form_name, form_classes):
-        forms = self.get_forms(form_classes, (form_name,))
-        form = forms.get(form_name)
-        if not form:
-            return HttpResponseForbidden()
-        elif form.is_valid():
-            return self.forms_valid(forms, form_name)
-        else:
-            return self.forms_invalid(forms)
-
-    def _process_all_forms(self, form_classes):
-        forms = self.get_forms(form_classes, None, True)
-        if all([form.is_valid() for form in forms.values()]):
-            return self.forms_valid(forms)
-        else:
-            return self.forms_invalid(forms)
-
-
-class BaseMultipleFormsView(MultiFormMixin, ProcessMultipleFormsView):
-    """
-    A base view for displaying several forms.
-    """
-
-
-class MultiFormsView(TemplateResponseMixin, BaseMultipleFormsView):
-    """
-    A view for displaying several forms, and rendering a template response.
-    """
