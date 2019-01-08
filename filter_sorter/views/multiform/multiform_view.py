@@ -1,6 +1,7 @@
 from django.views.generic.base import TemplateResponseMixin
 
-from filter_sorter import MultiFormMixin, ProcessMultipleFormsView
+from filter_sorter.views.multiform.multiform_process import ProcessMultipleFormsView
+from filter_sorter.views.multiform.multiform_mixin import MultiFormMixin
 
 
 class BaseMultipleFormsView(MultiFormMixin, ProcessMultipleFormsView):
